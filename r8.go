@@ -3,35 +3,22 @@ package r8
 
 import "fmt"
 
-const (
-	OpHALT = 0
-	OpNOP  = 1
-)
-
 type CPU struct {
-	PC     uint16
-	Memory [65536]byte
+	PC     int
+	Mem [256]int
 }
 
 func New() *CPU {
 	return &CPU{}
 }
 
-func (cpu *CPU) Run() {
-	for cpu.Step() {
-	}
-}
-
-func (cpu *CPU) Step() bool {
-	opcode := cpu.Memory[cpu.PC]
+func (cpu *CPU) Step() {
+	opcode := cpu.Mem[cpu.PC]
 	cpu.PC++
 	switch opcode {
-	case OpHALT:
-		return false
-	case OpNOP:
+	case 1:
 		// nothing to do
 	default:
 		panic(fmt.Sprintf("unimplemented opcode %d", opcode))
 	}
-	return true
 }
