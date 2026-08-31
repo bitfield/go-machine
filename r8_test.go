@@ -32,3 +32,14 @@ func TestStepTwiceIncrementsPCTwice(t *testing.T) {
 		t.Errorf("want pc == 2, got %d", cpu.PC)
 	}
 }
+
+func TestRunRunsUntilHalted(t *testing.T) {
+	t.Parallel()
+	cpu := r8.New()
+	cpu.Mem[0] = 1
+	cpu.Mem[1] = 0
+	cpu.Run()
+	if cpu.PC != 2 {
+		t.Errorf("want pc == 2, got %d", cpu.PC)
+	}
+}
