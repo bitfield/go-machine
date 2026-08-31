@@ -18,12 +18,17 @@ func TestNewInitialisesCPU(t *testing.T) {
 	}
 }
 
-func TestStepIncrementsPC(t *testing.T) {
+func TestStepTwiceIncrementsPCTwice(t *testing.T) {
 	t.Parallel()
 	cpu := r8.New()
 	cpu.Mem[0] = 1
+	cpu.Mem[1] = 1
 	cpu.Step()
 	if cpu.PC != 1 {
 		t.Errorf("want pc == 1, got %d", cpu.PC)
+	}
+	cpu.Step()
+	if cpu.PC != 2 {
+		t.Errorf("want pc == 2, got %d", cpu.PC)
 	}
 }
