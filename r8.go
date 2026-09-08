@@ -6,6 +6,7 @@ import "fmt"
 const (
 	OpHALT = 0
 	OpNOP  = 1
+	OpINC  = 48
 )
 
 type CPU struct {
@@ -30,7 +31,9 @@ func (cpu *CPU) Step() bool {
 	case OpHALT:
 		return false
 	case OpNOP:
-		// nothing to do
+	// nothing to do
+	case OpINC:
+		cpu.A++
 	default:
 		panic(fmt.Sprintf("unimplemented opcode %d", opcode))
 	}

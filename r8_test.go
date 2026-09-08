@@ -46,3 +46,14 @@ func TestRunRunsUntilHalted(t *testing.T) {
 		t.Errorf("want pc == 2, got %d", cpu.PC)
 	}
 }
+
+func TestIncIncrementsA(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.Mem[0] = r8.OpINC
+	cpu.Mem[1] = r8.OpHALT
+	cpu.Run()
+	if cpu.A != 1 {
+		t.Errorf("want a == 1, got %d", cpu.A)
+	}
+}
