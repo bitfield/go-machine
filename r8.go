@@ -9,6 +9,7 @@ const (
 )
 
 type CPU struct {
+	A   int
 	PC  int
 	Mem [256]int
 }
