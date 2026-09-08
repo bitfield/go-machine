@@ -21,8 +21,8 @@ func TestNewCPU_InitialisesCPU(t *testing.T) {
 func TestStepTwiceIncrementsPCTwice(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.Mem[0] = 1
-	cpu.Mem[1] = 1
+	cpu.Mem[0] = r8.OpNOP
+	cpu.Mem[1] = r8.OpNOP
 	cpu.Step()
 	if cpu.PC != 1 {
 		t.Errorf("want pc == 1, got %d", cpu.PC)
@@ -36,8 +36,8 @@ func TestStepTwiceIncrementsPCTwice(t *testing.T) {
 func TestRunRunsUntilHalted(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.Mem[0] = 1
-	cpu.Mem[1] = 0
+	cpu.Mem[0] = r8.OpNOP
+	cpu.Mem[1] = r8.OpHALT
 	cpu.Run()
 	if cpu.PC != 2 {
 		t.Errorf("want pc == 2, got %d", cpu.PC)
