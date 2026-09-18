@@ -13,7 +13,7 @@ const (
 type CPU struct {
 	A   uint8
 	PC  uint16
-	Mem [65536]int
+	Mem [65536]uint8
 }
 
 func NewCPU() *CPU {

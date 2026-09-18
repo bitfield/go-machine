@@ -93,3 +93,10 @@ func TestStepWrapsPCFrom65535To0(t *testing.T) {
 		t.Errorf("want pc == 1, got %d", cpu.PC)
 	}
 }
+
+func TestMemoryIsBytes(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	var value uint8 = 0
+	cpu.Mem[0] = value
+}
