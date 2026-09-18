@@ -81,3 +81,15 @@ func TestDecWrapsAFrom0To255(t *testing.T) {
 		t.Errorf("want a == 255, got %d", cpu.A)
 	}
 }
+
+func TestStepWrapsPCFrom65535To0(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.Mem[65535] = r8.OpINC
+	cpu.Mem[0] = r8.OpHALT
+	cpu.PC = 65535
+	cpu.Run()
+	if cpu.PC != 1 {
+		t.Errorf("want pc == 1, got %d", cpu.PC)
+	}
+}
