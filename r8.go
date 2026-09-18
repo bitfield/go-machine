@@ -7,6 +7,7 @@ const (
 	OpHALT = 0
 	OpNOP  = 1
 	OpINC  = 48
+	OpDEC  = 64
 )
 
 type CPU struct {
@@ -34,6 +35,8 @@ func (cpu *CPU) Step() bool {
 	// nothing to do
 	case OpINC:
 		cpu.A++
+	case OpDEC:
+		cpu.A--
 	default:
 		panic(fmt.Sprintf("unimplemented opcode %d", opcode))
 	}
