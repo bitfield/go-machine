@@ -57,3 +57,15 @@ func TestIncIncrementsA(t *testing.T) {
 		t.Errorf("want a == 1, got %d", cpu.A)
 	}
 }
+
+func TestIncWrapsAFrom255To0(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.Mem[0] = r8.OpINC
+	cpu.Mem[1] = r8.OpHALT
+	cpu.A = 255
+	cpu.Run()
+	if cpu.A != 0 {
+		t.Errorf("want a == 0, got %d", cpu.A)
+	}
+}
