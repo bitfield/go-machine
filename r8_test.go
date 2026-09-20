@@ -37,7 +37,7 @@ func TestStepIncrementsPC(t *testing.T) {
 func TestIncIncrementsA(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.Mem[0] = 48 // `inc`
+	cpu.Mem[0] = r8.OpINC
 	cpu.Step()
 	if cpu.A != 1 {
 		t.Errorf("want a == 1, got %d", cpu.A)
@@ -47,7 +47,7 @@ func TestIncIncrementsA(t *testing.T) {
 func TestIncWrapsAFrom255To0(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.Mem[0] = 48 // `inc`
+	cpu.Mem[0] = r8.OpINC
 	cpu.A = 255
 	cpu.Step()
 	if cpu.A != 0 {
@@ -58,7 +58,7 @@ func TestIncWrapsAFrom255To0(t *testing.T) {
 func TestDecWrapsAFrom0To255(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.Mem[0] = 64 // `dec`
+	cpu.Mem[0] = r8.OpDEC
 	cpu.A = 0
 	cpu.Step()
 	if cpu.A != 255 {
@@ -86,8 +86,8 @@ func TestMemoryIsBytes(t *testing.T) {
 func TestRunRunsUntilHalted(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.Mem[0] = 48 // `inc`
-	cpu.Mem[1] = 0  // `halt`
+	cpu.Mem[0] = r8.OpINC
+	cpu.Mem[1] = r8.OpHALT
 	cpu.Run()
 	if cpu.A != 1 {
 		t.Errorf("want a == 1, got %d", cpu.A)
