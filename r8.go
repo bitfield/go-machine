@@ -4,7 +4,7 @@ package r8
 type CPU struct {
 	A   byte
 	PC  uint16
-	Mem [65536]int
+	Mem [65536]byte
 }
 
 func NewCPU() *CPU {
