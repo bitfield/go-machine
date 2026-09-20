@@ -54,3 +54,14 @@ func TestIncWrapsAFrom255To0(t *testing.T) {
 		t.Errorf("want A == 0, got %d", cpu.A)
 	}
 }
+
+func TestDecWrapsAFrom0To255(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.Mem[0] = 64 // `dec a`
+	cpu.A = 0
+	cpu.Step()
+	if cpu.A != 255 {
+		t.Errorf("want A == 255, got %d", cpu.A)
+	}
+}
