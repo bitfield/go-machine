@@ -14,7 +14,10 @@ func NewCPU() *CPU {
 func (cpu *CPU) Step() {
 	opcode := cpu.Mem[cpu.PC]
 	cpu.PC++
-	if opcode == 48 { // `inc a`
+	switch opcode {
+	case 48: // `inc a`
 		cpu.A++
+	case 64: // `dec a`
+		cpu.A--
 	}
 }
