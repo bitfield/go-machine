@@ -2,6 +2,7 @@
 package r8
 
 type CPU struct {
+	A   int
 	PC  int
 	Mem [65536]int
 }
