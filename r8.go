@@ -12,5 +12,9 @@ func NewCPU() *CPU {
 }
 
 func (cpu *CPU) Step() {
+	opcode := cpu.Mem[cpu.PC]
 	cpu.PC++
+	if opcode == 48 { // `inc`
+		cpu.A++
+	}
 }
