@@ -82,3 +82,17 @@ func TestMemoryIsBytes(t *testing.T) {
 	var value byte = 0
 	cpu.Mem[0] = value
 }
+
+func TestRunRunsUntilHalted(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.Mem[0] = 48 // `inc`
+	cpu.Mem[1] = 0  // `halt`
+	cpu.Run()
+	if cpu.A != 1 {
+		t.Errorf("want a == 1, got %d", cpu.A)
+	}
+	if cpu.PC != 2 {
+		t.Errorf("want pc == 2, got %d", cpu.PC)
+	}
+}
