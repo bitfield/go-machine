@@ -3,7 +3,7 @@ package r8
 
 type CPU struct {
 	A   byte
-	PC  int
+	PC  uint16
 	Mem [65536]int
 }
 
