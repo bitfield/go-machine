@@ -33,3 +33,13 @@ func TestStepIncrementsPC(t *testing.T) {
 		t.Errorf("want PC == 2, got %d", cpu.PC)
 	}
 }
+
+func TestIncIncrementsA(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.Mem[0] = 48 // `inc a`
+	cpu.Step()
+	if cpu.A != 1 {
+		t.Errorf("want A == 1, got %d", cpu.A)
+	}
+}
