@@ -110,3 +110,18 @@ func TestLdLoadsAccumulator(t *testing.T) {
 		t.Errorf("want pc == 2, got %d", cpu.PC)
 	}
 }
+
+func TestAddAddsToAccumulator(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.A = 1
+	cpu.Mem[0] = r8.OpADD
+	cpu.Mem[1] = 2
+	cpu.Step()
+	if cpu.A != 3 {
+		t.Errorf("want a == 3, got %d", cpu.A)
+	}
+	if cpu.PC != 2 {
+		t.Errorf("want pc == 2, got %d", cpu.PC)
+	}
+}
