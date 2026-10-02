@@ -6,6 +6,7 @@ const (
 	OpHALT  = 0
 	OpINC_A = 48
 	OpLD_A  = 16
+	OpADD_A = 80
 )
 
 type CPU struct {
@@ -27,6 +28,9 @@ func (cpu *CPU) Fetch() byte {
 func (cpu *CPU) Step() bool {
 	opcode := cpu.Fetch()
 	switch opcode {
+	case OpADD_A:
+		operand := cpu.Fetch()
+		cpu.A += operand
 	case OpDEC_A:
 		cpu.A--
 	case OpHALT:
