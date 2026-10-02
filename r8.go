@@ -2,6 +2,7 @@
 package r8
 
 const (
+	OpADD_A = 80
 	OpDEC_A = 64
 	OpHALT  = 0
 	OpINC_A = 48
@@ -27,6 +28,9 @@ func (cpu *CPU) Fetch() byte {
 func (cpu *CPU) Step() bool {
 	opcode := cpu.Fetch()
 	switch opcode {
+	case OpADD_A:
+		operand := cpu.Fetch()
+		cpu.A += operand
 	case OpDEC_A:
 		cpu.A--
 	case OpHALT:
