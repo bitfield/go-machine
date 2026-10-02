@@ -5,6 +5,7 @@ const (
 	OpDEC_A = 64
 	OpHALT  = 0
 	OpINC_A = 48
+	OpLD_A  = 16
 )
 
 type CPU struct {
@@ -27,6 +28,10 @@ func (cpu *CPU) Step() bool {
 		return false
 	case OpINC_A:
 		cpu.A++
+	case OpLD_A:
+		operand := cpu.Mem[cpu.PC]
+		cpu.PC++
+		cpu.A = operand
 	}
 	return true
 }
