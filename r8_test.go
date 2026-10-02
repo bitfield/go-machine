@@ -37,8 +37,10 @@ func TestStepIncrementsPC(t *testing.T) {
 func TestIncIncrementsA(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.Mem[0] = r8.OpINC
-	cpu.Step()
+	cpu.RunProgram([]byte{
+		r8.OpINC,
+		r8.OpHALT,
+	})
 	if cpu.A != 1 {
 		t.Errorf("want a == 1, got %d", cpu.A)
 	}
@@ -47,9 +49,11 @@ func TestIncIncrementsA(t *testing.T) {
 func TestIncWrapsAFrom255To0(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.Mem[0] = r8.OpINC
 	cpu.A = 255
-	cpu.Step()
+	cpu.RunProgram([]byte{
+		r8.OpINC,
+		r8.OpHALT,
+	})
 	if cpu.A != 0 {
 		t.Errorf("want a == 0, got %d", cpu.A)
 	}
@@ -58,9 +62,11 @@ func TestIncWrapsAFrom255To0(t *testing.T) {
 func TestDecWrapsAFrom0To255(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.Mem[0] = r8.OpDEC
 	cpu.A = 0
-	cpu.Step()
+	cpu.RunProgram([]byte{
+		r8.OpDEC,
+		r8.OpHALT,
+	})
 	if cpu.A != 255 {
 		t.Errorf("want a == 255, got %d", cpu.A)
 	}
@@ -86,9 +92,10 @@ func TestMemoryIsBytes(t *testing.T) {
 func TestRunRunsUntilHalted(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.Mem[0] = r8.OpINC
-	cpu.Mem[1] = r8.OpHALT
-	cpu.Run()
+	cpu.RunProgram([]byte{
+		r8.OpINC,
+		r8.OpHALT,
+	})
 	if cpu.A != 1 {
 		t.Errorf("want a == 1, got %d", cpu.A)
 	}
@@ -100,14 +107,15 @@ func TestRunRunsUntilHalted(t *testing.T) {
 func TestLdLoadsAccumulator(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.Mem[0] = r8.OpLD
-	cpu.Mem[1] = 5
-	cpu.Step()
+	cpu.RunProgram([]byte{
+		r8.OpLD, 5,
+		r8.OpHALT,
+	})
 	if cpu.A != 5 {
 		t.Errorf("want a == 5, got %d", cpu.A)
 	}
-	if cpu.PC != 2 {
-		t.Errorf("want pc == 2, got %d", cpu.PC)
+	if cpu.PC != 3 {
+		t.Errorf("want pc == 3, got %d", cpu.PC)
 	}
 }
 
@@ -115,13 +123,14 @@ func TestAddAddsToAccumulator(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.A = 1
-	cpu.Mem[0] = r8.OpADD
-	cpu.Mem[1] = 2
-	cpu.Step()
+	cpu.RunProgram([]byte{
+		r8.OpADD, 2,
+		r8.OpHALT,
+	})
 	if cpu.A != 3 {
 		t.Errorf("want a == 3, got %d", cpu.A)
 	}
-	if cpu.PC != 2 {
-		t.Errorf("want pc == 2, got %d", cpu.PC)
+	if cpu.PC != 3 {
+		t.Errorf("want pc == 3, got %d", cpu.PC)
 	}
 }
