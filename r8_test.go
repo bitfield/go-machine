@@ -96,3 +96,17 @@ func TestRunRunsUntilHalted(t *testing.T) {
 		t.Errorf("want pc == 2, got %d", cpu.PC)
 	}
 }
+
+func TestLdLoadsAccumulator(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.Mem[0] = r8.OpLD
+	cpu.Mem[1] = 5
+	cpu.Step()
+	if cpu.A != 5 {
+		t.Errorf("want a == 5, got %d", cpu.A)
+	}
+	if cpu.PC != 2 {
+		t.Errorf("want pc == 2, got %d", cpu.PC)
+	}
+}
