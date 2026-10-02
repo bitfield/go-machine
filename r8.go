@@ -18,9 +18,14 @@ func NewCPU() *CPU {
 	return &CPU{}
 }
 
-func (cpu *CPU) Step() bool {
-	opcode := cpu.Mem[cpu.PC]
+func (cpu *CPU) Fetch() byte {
+	value := cpu.Mem[cpu.PC]
 	cpu.PC++
+	return value
+}
+
+func (cpu *CPU) Step() bool {
+	opcode := cpu.Fetch()
 	switch opcode {
 	case OpDEC_A:
 		cpu.A--
@@ -29,8 +34,7 @@ func (cpu *CPU) Step() bool {
 	case OpINC_A:
 		cpu.A++
 	case OpLD_A:
-		operand := cpu.Mem[cpu.PC]
-		cpu.PC++
+		operand := cpu.Fetch()
 		cpu.A = operand
 	}
 	return true
