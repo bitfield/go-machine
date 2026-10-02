@@ -25,6 +25,12 @@ func (cpu *CPU) Fetch() byte {
 	return value
 }
 
+func (cpu *CPU) RunProgram(program []byte) {
+	copy(cpu.Mem[:], program)
+	cpu.PC = 0
+	cpu.Run()
+}
+
 func (cpu *CPU) Step() bool {
 	opcode := cpu.Fetch()
 	switch opcode {
