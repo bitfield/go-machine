@@ -135,3 +135,16 @@ func TestAddAddsToAccumulator(t *testing.T) {
 		t.Errorf("want PC == 3, got %d", cpu.PC)
 	}
 }
+
+func TestJmpJumpsToSpecifiedAddress(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.RunProgram([]byte{
+		r8.OpJMP, 4, 0,
+		r8.OpHALT,
+		r8.OpHALT,
+	})
+	if cpu.PC != 5 {
+		t.Errorf("want PC == 5, got %d", cpu.PC)
+	}
+}
