@@ -1,11 +1,14 @@
 // Package r8 emulates a simple CPU called the R8.
 package r8
 
+import "encoding/binary"
+
 const (
 	OpADD_A = 80
 	OpDEC_A = 64
 	OpHALT  = 0
 	OpINC_A = 48
+	OpJMP   = 247
 	OpLD_A  = 16
 )
 
@@ -43,6 +46,11 @@ func (cpu *CPU) Step() bool {
 		return false
 	case OpINC_A:
 		cpu.A++
+	case OpJMP:
+		addr_lo := cpu.Fetch()
+		addr_hi := cpu.Fetch()
+		addr := binary.LittleEndian.Uint16([]byte{addr_lo, addr_hi})
+		cpu.PC = addr
 	case OpLD_A:
 		operand := cpu.Fetch()
 		cpu.A = operand
