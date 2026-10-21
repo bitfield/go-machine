@@ -5,6 +5,7 @@ import "encoding/binary"
 
 const (
 	OpADD_A = 80
+	OpBRA   = 240
 	OpDEC_A = 64
 	OpHALT  = 0
 	OpINC_A = 48
@@ -42,6 +43,9 @@ func (cpu *CPU) Step() bool {
 		operand := cpu.Fetch()
 		cpu.A += operand
 		cpu.UpdateZero(cpu.A)
+	case OpBRA:
+		displacement := cpu.Fetch()
+		cpu.PC += uint16(displacement)
 	case OpDEC_A:
 		cpu.A--
 		cpu.UpdateZero(cpu.A)
