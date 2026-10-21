@@ -81,3 +81,16 @@ func (cpu *CPU) Run() {
 func (cpu *CPU) UpdateZero(value byte) {
 	cpu.Zero = value == 0
 }
+
+func Disassemble(code byte) string {
+	switch code {
+	case OpDEC_A:
+		return "dec a"
+	case OpHALT:
+		return "halt"
+	case OpINC_A:
+		return "inc a"
+	default:
+		return "???"
+	}
+}

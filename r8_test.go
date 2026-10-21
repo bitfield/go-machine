@@ -256,3 +256,37 @@ func TestBeqDoesNotBranchIfZeroFlagClear(t *testing.T) {
 		t.Errorf("want PC == 5, got %d", cpu.PC)
 	}
 }
+
+func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		code   byte
+		source string
+	}{
+		{
+			code:   r8.OpDEC_A,
+			source: "dec a",
+		},
+		{
+			code:   r8.OpHALT,
+			source: "halt",
+		},
+		{
+			code:   r8.OpINC_A,
+			source: "inc a",
+		},
+		{
+			code:   255,
+			source: "???",
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.source, func(t *testing.T) {
+			t.Parallel()
+			source := r8.Disassemble(tc.code)
+			if source != tc.source {
+				t.Errorf("%v: want %q, got %q", tc.code, tc.source, source)
+			}
+		})
+	}
+}
