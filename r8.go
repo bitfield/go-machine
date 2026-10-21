@@ -41,12 +41,15 @@ func (cpu *CPU) Step() bool {
 	case OpADD_A:
 		operand := cpu.Fetch()
 		cpu.A += operand
+		cpu.UpdateZero(cpu.A)
 	case OpDEC_A:
 		cpu.A--
+		cpu.UpdateZero(cpu.A)
 	case OpHALT:
 		return false
 	case OpINC_A:
 		cpu.A++
+		cpu.UpdateZero(cpu.A)
 	case OpJMP:
 		addr_lo := cpu.Fetch()
 		addr_hi := cpu.Fetch()
@@ -55,6 +58,7 @@ func (cpu *CPU) Step() bool {
 	case OpLD_A:
 		operand := cpu.Fetch()
 		cpu.A = operand
+		cpu.UpdateZero(cpu.A)
 	}
 	return true
 }
@@ -62,4 +66,8 @@ func (cpu *CPU) Step() bool {
 func (cpu *CPU) Run() {
 	for cpu.Step() {
 	}
+}
+
+func (cpu *CPU) UpdateZero(value byte) {
+	cpu.Zero = value == 0
 }

@@ -40,12 +40,16 @@ func TestStepIncrementsPC(t *testing.T) {
 func TestIncIncrementsA(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
+	cpu.Zero = true
 	cpu.RunProgram([]byte{
 		r8.OpINC_A,
 		r8.OpHALT,
 	})
 	if cpu.A != 1 {
 		t.Errorf("want A == 1, got %d", cpu.A)
+	}
+	if cpu.Zero {
+		t.Errorf("want zero == false, got true")
 	}
 }
 
@@ -60,18 +64,41 @@ func TestIncWrapsAFrom255To0(t *testing.T) {
 	if cpu.A != 0 {
 		t.Errorf("want A == 0, got %d", cpu.A)
 	}
+	if !cpu.Zero {
+		t.Errorf("want zero == true, got false")
+	}
+}
+
+func TestDecDecrementsA(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.A = 1
+	cpu.RunProgram([]byte{
+		r8.OpDEC_A,
+		r8.OpHALT,
+	})
+	if cpu.A != 0 {
+		t.Errorf("want A == 0, got %d", cpu.A)
+	}
+	if !cpu.Zero {
+		t.Errorf("want zero == true, got false")
+	}
 }
 
 func TestDecWrapsAFrom0To255(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.A = 0
+	cpu.Zero = true
 	cpu.RunProgram([]byte{
 		r8.OpDEC_A,
 		r8.OpHALT,
 	})
 	if cpu.A != 255 {
 		t.Errorf("want A == 255, got %d", cpu.A)
+	}
+	if cpu.Zero {
+		t.Errorf("want zero == false, got true")
 	}
 }
 
@@ -111,6 +138,7 @@ func TestLdLoadsAccumulator(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.A = 10
+	cpu.Zero = true
 	cpu.RunProgram([]byte{
 		r8.OpLD_A, 5,
 		r8.OpHALT,
@@ -121,12 +149,28 @@ func TestLdLoadsAccumulator(t *testing.T) {
 	if cpu.PC != 3 {
 		t.Errorf("want PC == 3, got %d", cpu.PC)
 	}
+	if cpu.Zero {
+		t.Errorf("want zero == false, got true")
+	}
+}
+
+func TestLdSetsZeroFlag(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.RunProgram([]byte{
+		r8.OpLD_A, 0,
+		r8.OpHALT,
+	})
+	if !cpu.Zero {
+		t.Errorf("want zero == true, got false")
+	}
 }
 
 func TestAddAddsToAccumulator(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.A = 1
+	cpu.Zero = true
 	cpu.RunProgram([]byte{
 		r8.OpADD_A, 2,
 		r8.OpHALT,
@@ -136,6 +180,22 @@ func TestAddAddsToAccumulator(t *testing.T) {
 	}
 	if cpu.PC != 3 {
 		t.Errorf("want PC == 3, got %d", cpu.PC)
+	}
+	if cpu.Zero {
+		t.Errorf("want zero == false, got true")
+	}
+}
+
+func TestAddSetsZeroFlag(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.A = 1
+	cpu.RunProgram([]byte{
+		r8.OpADD_A, 255,
+		r8.OpHALT,
+	})
+	if !cpu.Zero {
+		t.Errorf("want zero == true, got false")
 	}
 }
 
