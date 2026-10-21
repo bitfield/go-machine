@@ -224,3 +224,31 @@ func TestBraAlwaysBranches(t *testing.T) {
 		t.Errorf("want PC == 4, got %d", cpu.PC)
 	}
 }
+
+func TestBeqTakesBranchIfZeroFlagSet(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.RunProgram([]byte{
+		r8.OpLD_A, 0,
+		r8.OpBEQ, 1,
+		r8.OpHALT,
+		r8.OpHALT,
+	})
+	if cpu.PC != 6 {
+		t.Errorf("want PC == 6, got %d", cpu.PC)
+	}
+}
+
+func TestBeqDoesNotBranchIfZeroFlagClear(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.RunProgram([]byte{
+		r8.OpLD_A, 1,
+		r8.OpBEQ, 1,
+		r8.OpHALT,
+		r8.OpHALT,
+	})
+	if cpu.PC != 5 {
+		t.Errorf("want PC == 5, got %d", cpu.PC)
+	}
+}
