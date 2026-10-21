@@ -15,6 +15,9 @@ func TestNewCPU_InitialisesCPU(t *testing.T) {
 	if cpu.A != 0 {
 		t.Errorf("after New, want A == 0, got %d", cpu.A)
 	}
+	if cpu.Zero {
+		t.Errorf("after New, want zero == false, got true")
+	}
 	got := cpu.Mem[0]
 	if got != 0 {
 		t.Errorf("after New, want Memory[0] == 0, got %d", got)

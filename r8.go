@@ -13,9 +13,10 @@ const (
 )
 
 type CPU struct {
-	A   byte
-	PC  uint16
-	Mem [65536]byte
+	A    byte
+	PC   uint16
+	Mem  [65536]byte
+	Zero bool
 }
 
 func NewCPU() *CPU {
