@@ -96,6 +96,8 @@ func Disassemble(code []byte) string {
 		return "halt"
 	case OpINC_A:
 		return "inc a"
+	case OpJMP:
+		return fmt.Sprintf("jmp %s", formatWord(code[1:]))
 	case OpLD_A:
 		return fmt.Sprintf("ld a, %s", formatByte(code[1:]))
 	default:
@@ -108,4 +110,13 @@ func formatByte(code []byte) string {
 		return "???"
 	}
 	return strconv.Itoa(int(code[0]))
+}
+
+func formatWord(code []byte) string {
+	if len(code) < 2 {
+		return "???"
+	}
+	addr_lo, addr_hi := code[0], code[1]
+	addr := binary.LittleEndian.Uint16([]byte{addr_lo, addr_hi})
+	return strconv.Itoa(int(addr))
 }
