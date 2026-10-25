@@ -295,9 +295,12 @@ func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.source, func(t *testing.T) {
 			t.Parallel()
-			source := r8.Disassemble(tc.code)
+			source, bytes := r8.Disassemble(tc.code)
 			if source != tc.source {
 				t.Errorf("%v: want %q, got %q", tc.code, tc.source, source)
+			}
+			if bytes != len(tc.code) {
+				t.Errorf("%s: want %d, got %d", tc.source, len(tc.code), bytes)
 			}
 		})
 	}

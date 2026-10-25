@@ -21,7 +21,7 @@ func main() {
 	copy(cpu.Mem[:], program)
 	for {
 		code := cpu.Mem[cpu.PC : cpu.PC+3]
-		asm := r8.Disassemble(code)
+		asm, _ := r8.Disassemble(code)
 		fmt.Println("  PC  A | NEXT")
 		fmt.Printf("%04d %02d | %s\n> ", cpu.PC, cpu.A, asm)
 		fmt.Scanln()
