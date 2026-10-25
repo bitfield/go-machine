@@ -1,7 +1,11 @@
 // Package r8 emulates a simple CPU called the R8.
 package r8
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"fmt"
+	"strconv"
+)
 
 const (
 	OpADD_A = 80
@@ -82,15 +86,26 @@ func (cpu *CPU) UpdateZero(value byte) {
 	cpu.Zero = value == 0
 }
 
-func Disassemble(code byte) string {
-	switch code {
+func Disassemble(code []byte) string {
+	switch code[0] {
+	case OpBEQ:
+		return fmt.Sprintf("beq %s", formatByte(code[1:]))
 	case OpDEC_A:
 		return "dec a"
 	case OpHALT:
 		return "halt"
 	case OpINC_A:
 		return "inc a"
+	case OpLD_A:
+		return fmt.Sprintf("ld a, %s", formatByte(code[1:]))
 	default:
 		return "???"
 	}
+}
+
+func formatByte(code []byte) string {
+	if len(code) < 1 {
+		return "???"
+	}
+	return strconv.Itoa(int(code[0]))
 }

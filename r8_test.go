@@ -256,23 +256,31 @@ func TestBeqDoesNotBranchIfZeroFlagClear(t *testing.T) {
 func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
-		code   byte
+		code   []byte
 		source string
 	}{
 		{
-			code:   r8.OpDEC_A,
+			code:   []byte{r8.OpBEQ, 3},
+			source: "beq 3",
+		},
+		{
+			code:   []byte{r8.OpDEC_A},
 			source: "dec a",
 		},
 		{
-			code:   r8.OpHALT,
+			code:   []byte{r8.OpHALT},
 			source: "halt",
 		},
 		{
-			code:   r8.OpINC_A,
+			code:   []byte{r8.OpINC_A},
 			source: "inc a",
 		},
 		{
-			code:   255,
+			code:   []byte{r8.OpLD_A, 10},
+			source: "ld a, 10",
+		},
+		{
+			code:   []byte{255},
 			source: "???",
 		},
 	}
