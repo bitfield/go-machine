@@ -19,9 +19,11 @@ func main() {
 	}
 	cpu := r8.NewCPU()
 	copy(cpu.Mem[:], program)
-	fmt.Println("  PC  A")
 	for {
-		fmt.Printf("%04d %02d >", cpu.PC, cpu.A)
+		code := cpu.Mem[cpu.PC]
+		asm := r8.Disassemble(code)
+		fmt.Println("  PC  A | NEXT")
+		fmt.Printf("%04d %02d | %s\n> ", cpu.PC, cpu.A, asm)
 		fmt.Scanln()
 		cpu.Step()
 	}
