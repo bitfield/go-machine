@@ -86,22 +86,22 @@ func (cpu *CPU) UpdateZero(value byte) {
 	cpu.Zero = value == 0
 }
 
-func Disassemble(code []byte) string {
+func Disassemble(code []byte) (string, int) {
 	switch code[0] {
 	case OpBEQ:
-		return fmt.Sprintf("beq %s", formatByte(code[1:]))
+		return fmt.Sprintf("beq %s", formatByte(code[1:])), 2
 	case OpDEC_A:
-		return "dec a"
+		return "dec a", 1
 	case OpHALT:
-		return "halt"
+		return "halt", 1
 	case OpINC_A:
-		return "inc a"
+		return "inc a", 1
 	case OpJMP:
-		return fmt.Sprintf("jmp %s", formatWord(code[1:]))
+		return fmt.Sprintf("jmp %s", formatWord(code[1:])), 3
 	case OpLD_A:
-		return fmt.Sprintf("ld a, %s", formatByte(code[1:]))
+		return fmt.Sprintf("ld a, %s", formatByte(code[1:])), 2
 	default:
-		return "???"
+		return "???", 1
 	}
 }
 
