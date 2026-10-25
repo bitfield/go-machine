@@ -280,6 +280,10 @@ func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 			source: "inc a",
 		},
 		{
+			code:   []byte{r8.OpJMP, 2, 0},
+			source: "jmp 2",
+		},
+		{
 			code:   []byte{r8.OpLD_A, 10},
 			source: "ld a, 10",
 		},
