@@ -3,19 +3,21 @@ package main
 import (
 	"fmt"
 	"os"
-	"strconv"
 
 	r8 "github.com/bitfield/go-machine"
 )
 
+var usage = "Usage: r8 FILE"
+
 func main() {
-	var program []byte
-	for _, arg := range os.Args[1:] {
-		value, err := strconv.ParseUint(arg, 10, 8)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
-		program = append(program, byte(value))
+	if len(os.Args) < 2 {
+		fmt.Println(usage)
+		return
+	}
+	program, err := os.ReadFile(os.Args[1])
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 	cpu := r8.NewCPU()
 	copy(cpu.Mem[:], program)
