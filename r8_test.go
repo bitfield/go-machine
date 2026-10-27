@@ -284,6 +284,10 @@ func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 			source: "ld a, 10",
 		},
 		{
+			code:   []byte{r8.OpTRAP, 32},
+			source: "trap 32",
+		},
+		{
 			code:   []byte{255},
 			source: "???",
 		},

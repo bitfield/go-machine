@@ -16,6 +16,7 @@ const (
 	OpINC_A = 48
 	OpJMP   = 247
 	OpLD_A  = 16
+	OpTRAP  = 249
 )
 
 type CPU struct {
@@ -73,6 +74,11 @@ func (cpu *CPU) Step() bool {
 		operand := cpu.Fetch()
 		cpu.A = operand
 		cpu.UpdateZero(cpu.A)
+	case OpTRAP:
+		operand := cpu.Fetch()
+		if operand == 32 {
+			fmt.Printf("%c", cpu.A)
+		}
 	}
 	return true
 }
@@ -100,6 +106,8 @@ func Disassemble(code []byte) (string, int) {
 		return fmt.Sprintf("jmp %s", formatWord(code[1:])), 3
 	case OpLD_A:
 		return fmt.Sprintf("ld a, %s", formatByte(code[1:])), 2
+	case OpTRAP:
+		return fmt.Sprintf("trap %s", formatByte(code[1:])), 2
 	default:
 		return "???", 1
 	}
