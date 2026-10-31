@@ -9,32 +9,19 @@ import (
 func TestNewCPU_InitialisesCPU(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	if cpu.PC != 0 {
-		t.Errorf("after New, want PC == 0, got %d", cpu.PC)
-	}
-	if cpu.A != 0 {
-		t.Errorf("after New, want A == 0, got %d", cpu.A)
-	}
-	if cpu.Zero {
-		t.Errorf("after New, want zero == false, got true")
-	}
-	got := cpu.Mem[0]
-	if got != 0 {
-		t.Errorf("after New, want Mem[0] == 0, got %d", got)
-	}
+	assert_eq_hex16(t, cpu.PC, 0x0000, "wrong PC")
+	assert_eq_hex(t, cpu.A, 0x00, "wrong A")
+	assert_zero(t, cpu, false)
+	assert_eq_hex(t, cpu.Mem[0], 0x00, "wrong memory contents")
 }
 
 func TestStepIncrementsPC(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.Step()
-	if cpu.PC != 1 {
-		t.Errorf("want PC == 1, got %d", cpu.PC)
-	}
+	assert_eq_hex16(t, cpu.PC, 0x0001, "wrong PC")
 	cpu.Step()
-	if cpu.PC != 2 {
-		t.Errorf("want PC == 2, got %d", cpu.PC)
-	}
+	assert_eq_hex16(t, cpu.PC, 0x0002, "wrong PC")
 }
 
 func TestIncIncrementsA(t *testing.T) {
@@ -45,78 +32,60 @@ func TestIncIncrementsA(t *testing.T) {
 		r8.OpINC_A,
 		r8.OpHALT,
 	})
-	if cpu.A != 1 {
-		t.Errorf("want A == 1, got %d", cpu.A)
-	}
-	if cpu.Zero {
-		t.Errorf("want zero == false, got true")
-	}
+	assert_eq_hex(t, cpu.A, 0x01, "wrong A")
+	assert_zero(t, cpu, false)
 }
 
-func TestIncWrapsAFrom255To0(t *testing.T) {
+func TestIncWrapsAFromFFTo00(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.A = 255
+	cpu.A = 0xFF
 	cpu.RunProgram([]byte{
 		r8.OpINC_A,
 		r8.OpHALT,
 	})
-	if cpu.A != 0 {
-		t.Errorf("want A == 0, got %d", cpu.A)
-	}
-	if !cpu.Zero {
-		t.Errorf("want zero == true, got false")
-	}
+	assert_eq_hex(t, cpu.A, 0x00, "wrong A")
+	assert_zero(t, cpu, true)
 }
 
 func TestDecDecrementsA(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.A = 1
+	cpu.A = 0x01
 	cpu.RunProgram([]byte{
 		r8.OpDEC_A,
 		r8.OpHALT,
 	})
-	if cpu.A != 0 {
-		t.Errorf("want A == 0, got %d", cpu.A)
-	}
-	if !cpu.Zero {
-		t.Errorf("want zero == true, got false")
-	}
+	assert_eq_hex(t, cpu.A, 0x00, "wrong A")
+	assert_zero(t, cpu, true)
 }
 
-func TestDecWrapsAFrom0To255(t *testing.T) {
+func TestDecWrapsAFrom00ToFF(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.A = 0
+	cpu.A = 0x00
 	cpu.Zero = true
 	cpu.RunProgram([]byte{
 		r8.OpDEC_A,
 		r8.OpHALT,
 	})
-	if cpu.A != 255 {
-		t.Errorf("want A == 255, got %d", cpu.A)
-	}
-	if cpu.Zero {
-		t.Errorf("want zero == false, got true")
-	}
+	assert_eq_hex(t, cpu.A, 0xFF, "wrong A")
+	assert_zero(t, cpu, false)
 }
 
-func TestStepWrapsPCFrom65535To0(t *testing.T) {
+func TestStepWrapsPCFromFFFFTo0000(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.PC = 65535
+	cpu.PC = 0xFFFF
 	cpu.Step()
-	if cpu.PC != 0 {
-		t.Errorf("want PC == 0, got %d", cpu.PC)
-	}
+	assert_eq_hex16(t, cpu.PC, 0x0000, "wrong PC")
 }
 
 func TestMemoryIsBytes(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	var value byte = 0
-	cpu.Mem[0] = value
+	var value byte = 0x00
+	cpu.Mem[0x0000] = value
 }
 
 func TestRunRunsUntilHalted(t *testing.T) {
@@ -126,161 +95,127 @@ func TestRunRunsUntilHalted(t *testing.T) {
 		r8.OpINC_A,
 		r8.OpHALT,
 	})
-	if cpu.A != 1 {
-		t.Errorf("want A == 1, got %d", cpu.A)
-	}
-	if cpu.PC != 2 {
-		t.Errorf("want PC == 2, got %d", cpu.PC)
-	}
+	assert_eq_hex(t, cpu.A, 0x01, "wrong A")
+	assert_eq_hex16(t, cpu.PC, 0x0002, "wrong PC")
 }
 
 func TestLdLoadsAccumulator(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.A = 10
+	cpu.A = 0x0A
 	cpu.Zero = true
 	cpu.RunProgram([]byte{
-		r8.OpLD_A, 5,
+		r8.OpLD_A, 0x05,
 		r8.OpHALT,
 	})
-	if cpu.A != 5 {
-		t.Errorf("want A == 5, got %d", cpu.A)
-	}
-	if cpu.PC != 3 {
-		t.Errorf("want PC == 3, got %d", cpu.PC)
-	}
-	if cpu.Zero {
-		t.Errorf("want zero == false, got true")
-	}
+	assert_eq_hex(t, cpu.A, 0x05, "wrong A")
+	assert_eq_hex16(t, cpu.PC, 0x0003, "wrong PC")
+	assert_zero(t, cpu, false)
 }
 
 func TestLdSetsZeroFlag(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.RunProgram([]byte{
-		r8.OpLD_A, 0,
+		r8.OpLD_A, 0x00,
 		r8.OpHALT,
 	})
-	if !cpu.Zero {
-		t.Errorf("want zero == true, got false")
-	}
+	assert_zero(t, cpu, true)
 }
 
 func TestAddAddsToAccumulator(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.A = 1
+	cpu.A = 0x01
 	cpu.Zero = true
 	cpu.RunProgram([]byte{
-		r8.OpADD_A, 2,
+		r8.OpADD_A, 0x02,
 		r8.OpHALT,
 	})
-	if cpu.A != 3 {
-		t.Errorf("want A == 3, got %d", cpu.A)
-	}
-	if cpu.PC != 3 {
-		t.Errorf("want PC == 3, got %d", cpu.PC)
-	}
-	if cpu.Zero {
-		t.Errorf("want zero == false, got true")
-	}
+	assert_eq_hex(t, cpu.A, 0x03, "wrong A")
+	assert_eq_hex16(t, cpu.PC, 0x0003, "wrong PC")
+	assert_zero(t, cpu, false)
 }
 
 func TestAddSetsZeroFlag(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
-	cpu.A = 1
+	cpu.A = 0x01
 	cpu.RunProgram([]byte{
-		r8.OpADD_A, 255,
+		r8.OpADD_A, 0xFF,
 		r8.OpHALT,
 	})
-	if !cpu.Zero {
-		t.Errorf("want zero == true, got false")
-	}
+	assert_zero(t, cpu, true)
 }
 
 func TestJmpJumpsToSpecifiedAddress(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.RunProgram([]byte{
-		r8.OpJMP, 5, 0,
+		r8.OpJMP, 0x05, 0x00,
 		r8.OpINC_A,
 		r8.OpHALT,
 		r8.OpHALT,
 	})
-	if cpu.A != 0 {
-		t.Errorf("want A == 0, got %d", cpu.A)
-	}
-	if cpu.PC != 6 {
-		t.Errorf("want PC == 6, got %d", cpu.PC)
-	}
+	assert_eq_hex(t, cpu.A, 0x00, "wrong A")
+	assert_eq_hex16(t, cpu.PC, 0x0006, "wrong PC")
 }
 
 func TestBraAlwaysBranches(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.RunProgram([]byte{
-		r8.OpBRA, 1,
+		r8.OpBRA, 0x01,
 		r8.OpHALT,
 		r8.OpHALT,
 	})
-	if cpu.PC != 4 {
-		t.Errorf("want PC == 4, got %d", cpu.PC)
-	}
+	assert_eq_hex16(t, cpu.PC, 0x0004, "wrong PC")
 }
 
 func TestBeqTakesBranchIfZeroFlagSet(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.RunProgram([]byte{
-		r8.OpLD_A, 0,
-		r8.OpBEQ, 1,
+		r8.OpLD_A, 0x00,
+		r8.OpBEQ, 0x01,
 		r8.OpHALT,
 		r8.OpHALT,
 	})
-	if cpu.PC != 6 {
-		t.Errorf("want PC == 6, got %d", cpu.PC)
-	}
+	assert_eq_hex16(t, cpu.PC, 0x0006, "wrong PC")
 }
 
 func TestBeqDoesNotBranchIfZeroFlagClear(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.RunProgram([]byte{
-		r8.OpLD_A, 1,
-		r8.OpBEQ, 1,
+		r8.OpLD_A, 0x01,
+		r8.OpBEQ, 0x01,
 		r8.OpHALT,
 		r8.OpHALT,
 	})
-	if cpu.PC != 5 {
-		t.Errorf("want PC == 5, got %d", cpu.PC)
-	}
+	assert_eq_hex16(t, cpu.PC, 0x0005, "wrong PC")
 }
 
 func TestCmpSetsZeroIfOperandEqual(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.RunProgram([]byte{
-		r8.OpLD_A, 1,
-		r8.OpCMP_A, 1,
+		r8.OpLD_A, 0x01,
+		r8.OpCMP_A, 0x01,
 		r8.OpHALT,
 	})
-	if !cpu.Zero {
-		t.Errorf("want zero == true, got false")
-	}
+	assert_zero(t, cpu, true)
 }
 
 func TestCmpClearsZeroIfOperandNotEqual(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.RunProgram([]byte{
-		r8.OpLD_A, 0,
-		r8.OpCMP_A, 1,
+		r8.OpLD_A, 0x00,
+		r8.OpCMP_A, 0x01,
 		r8.OpHALT,
 	})
-	if cpu.Zero {
-		t.Errorf("want zero == false, got true")
-	}
+	assert_zero(t, cpu, false)
 }
 
 func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
@@ -290,12 +225,12 @@ func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 		source string
 	}{
 		{
-			code:   []byte{r8.OpBEQ, 3},
-			source: "beq 3",
+			code:   []byte{r8.OpBEQ, 0x03},
+			source: "beq 0x03",
 		},
 		{
-			code:   []byte{r8.OpCMP_A, 1},
-			source: "cmp a, 1",
+			code:   []byte{r8.OpCMP_A, 0x01},
+			source: "cmp a, 0x01",
 		},
 		{
 			code:   []byte{r8.OpDEC_A},
@@ -310,19 +245,19 @@ func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 			source: "inc a",
 		},
 		{
-			code:   []byte{r8.OpJMP, 2, 0},
-			source: "jmp 2",
+			code:   []byte{r8.OpJMP, 0x02, 0x00},
+			source: "jmp 0x0002",
 		},
 		{
-			code:   []byte{r8.OpLD_A, 10},
-			source: "ld a, 10",
+			code:   []byte{r8.OpLD_A, 0x0A},
+			source: "ld a, 0x0A",
 		},
 		{
-			code:   []byte{r8.OpTRAP, 32},
-			source: "trap 32",
+			code:   []byte{r8.OpTRAP, 0x20},
+			source: "trap 0x20",
 		},
 		{
-			code:   []byte{255},
+			code:   []byte{0xFF},
 			source: "???",
 		},
 	}
@@ -337,5 +272,25 @@ func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 				t.Errorf("%s: want %d, got %d", tc.source, len(tc.code), bytes)
 			}
 		})
+	}
+}
+
+func assert_eq_hex(t *testing.T, want, got byte, msg string) {
+	t.Helper()
+	if want != got {
+		t.Errorf("%s: want 0x%02X, got 0x%02X", msg, want, got)
+	}
+}
+
+func assert_eq_hex16(t *testing.T, want, got uint16, msg string) {
+	t.Helper()
+	if want != got {
+		t.Errorf("%s: want 0x%04X, got 0x%04X", msg, want, got)
+	}
+}
+
+func assert_zero(t *testing.T, cpu *r8.CPU, value bool) {
+	if cpu.Zero != value {
+		t.Errorf("want zero == %t, got %t", value, cpu.Zero)
 	}
 }
