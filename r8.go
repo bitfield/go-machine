@@ -4,20 +4,21 @@ package r8
 import (
 	"encoding/binary"
 	"fmt"
-	"strconv"
 )
 
 const (
-	OpADD_A = 80
-	OpBEQ   = 241
-	OpBRA   = 240
-	OpCMP_A = 112
-	OpDEC_A = 64
-	OpHALT  = 0
-	OpINC_A = 48
-	OpJMP   = 247
-	OpLD_A  = 16
-	OpTRAP  = 249
+	OpADD_A = 0x50
+	OpBEQ   = 0xF1
+	OpBRA   = 0xF0
+	OpCMP_A = 0x70
+	OpDEC_A = 0x40
+	OpHALT  = 0x00
+	OpINC_A = 0x30
+	OpJMP   = 0xF7
+	OpLD_A  = 0x10
+	OpTRAP  = 0xF9
+
+	TrapPRINT = 0x20
 )
 
 type CPU struct {
@@ -39,7 +40,7 @@ func (cpu *CPU) Fetch() byte {
 
 func (cpu *CPU) RunProgram(program []byte) {
 	copy(cpu.Mem[:], program)
-	cpu.PC = 0
+	cpu.PC = 0x0000
 	cpu.Run()
 }
 
@@ -80,7 +81,7 @@ func (cpu *CPU) Step() bool {
 		cpu.UpdateZero(cpu.A)
 	case OpTRAP:
 		operand := cpu.Fetch()
-		if operand == 32 {
+		if operand == TrapPRINT {
 			fmt.Printf("%c", cpu.A)
 		}
 	}
@@ -93,7 +94,7 @@ func (cpu *CPU) Run() {
 }
 
 func (cpu *CPU) UpdateZero(value byte) {
-	cpu.Zero = value == 0
+	cpu.Zero = value == 0x00
 }
 
 func Disassemble(code []byte) (string, int) {
@@ -123,7 +124,7 @@ func formatByte(code []byte) string {
 	if len(code) < 1 {
 		return "???"
 	}
-	return strconv.Itoa(int(code[0]))
+	return fmt.Sprintf("0x%02X", code[0])
 }
 
 func formatWord(code []byte) string {
@@ -132,5 +133,5 @@ func formatWord(code []byte) string {
 	}
 	addr_lo, addr_hi := code[0], code[1]
 	addr := binary.LittleEndian.Uint16([]byte{addr_lo, addr_hi})
-	return strconv.Itoa(int(addr))
+	return fmt.Sprintf("0x%04X", addr)
 }
