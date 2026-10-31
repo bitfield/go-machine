@@ -257,6 +257,32 @@ func TestBeqDoesNotBranchIfZeroFlagClear(t *testing.T) {
 	}
 }
 
+func TestCmpSetsZeroIfOperandEqual(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.RunProgram([]byte{
+		r8.OpLD_A, 1,
+		r8.OpCMP_A, 1,
+		r8.OpHALT,
+	})
+	if !cpu.Zero {
+		t.Errorf("want zero == true, got false")
+	}
+}
+
+func TestCmpClearsZeroIfOperandNotEqual(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.RunProgram([]byte{
+		r8.OpLD_A, 0,
+		r8.OpCMP_A, 1,
+		r8.OpHALT,
+	})
+	if cpu.Zero {
+		t.Errorf("want zero == false, got true")
+	}
+}
+
 func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
@@ -266,6 +292,10 @@ func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 		{
 			code:   []byte{r8.OpBEQ, 3},
 			source: "beq 3",
+		},
+		{
+			code:   []byte{r8.OpCMP_A, 1},
+			source: "cmp a, 1",
 		},
 		{
 			code:   []byte{r8.OpDEC_A},
