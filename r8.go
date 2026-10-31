@@ -11,6 +11,7 @@ const (
 	OpADD_A = 80
 	OpBEQ   = 241
 	OpBRA   = 240
+	OpCMP_A = 112
 	OpDEC_A = 64
 	OpHALT  = 0
 	OpINC_A = 48
@@ -57,6 +58,9 @@ func (cpu *CPU) Step() bool {
 	case OpBRA:
 		displacement := cpu.Fetch()
 		cpu.PC += uint16(displacement)
+	case OpCMP_A:
+		operand := cpu.Fetch()
+		cpu.Zero = cpu.A == operand
 	case OpDEC_A:
 		cpu.A--
 		cpu.UpdateZero(cpu.A)
@@ -96,6 +100,8 @@ func Disassemble(code []byte) (string, int) {
 	switch code[0] {
 	case OpBEQ:
 		return fmt.Sprintf("beq %s", formatByte(code[1:])), 2
+	case OpCMP_A:
+		return fmt.Sprintf("cmp a, %s", formatByte(code[1:])), 2
 	case OpDEC_A:
 		return "dec a", 1
 	case OpHALT:
