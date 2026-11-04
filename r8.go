@@ -16,7 +16,11 @@ const (
 	OpINC_A = 0x30
 	OpJMP   = 0xF7
 	OpLD_A  = 0x10
+	OpLD_B  = 0x11
 	OpTRAP  = 0xF9
+
+	RegA = 0x00
+	RegB = 0x01
 
 	TrapPRINT = 0x20
 )
@@ -97,6 +101,8 @@ func (cpu *CPU) UpdateZero(value byte) {
 	cpu.Zero = value == 0x00
 }
 
+type Reg byte
+
 func Disassemble(code []byte) (string, int) {
 	switch code[0] {
 	case OpBEQ:
@@ -113,6 +119,8 @@ func Disassemble(code []byte) (string, int) {
 		return fmt.Sprintf("jmp %s", formatWord(code[1:])), 3
 	case OpLD_A:
 		return fmt.Sprintf("ld a, %s", formatByte(code[1:])), 2
+	case OpLD_B:
+		return fmt.Sprintf("ld b, %s", formatByte(code[1:])), 2
 	case OpTRAP:
 		return fmt.Sprintf("trap %s", formatByte(code[1:])), 2
 	default:
@@ -134,4 +142,8 @@ func formatWord(code []byte) string {
 	addr_lo, addr_hi := code[0], code[1]
 	addr := binary.LittleEndian.Uint16([]byte{addr_lo, addr_hi})
 	return fmt.Sprintf("0x%04X", addr)
+}
+
+func GetTarget(opcode byte) Reg {
+	return Reg(opcode & 0x0F)
 }

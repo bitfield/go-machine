@@ -1,6 +1,7 @@
 package r8_test
 
 import (
+	"fmt"
 	"testing"
 
 	r8 "github.com/bitfield/go-machine"
@@ -216,6 +217,45 @@ func TestCmpClearsZeroIfOperandNotEqual(t *testing.T) {
 	assert_zero(t, cpu, false)
 }
 
+func TestGetTargetExtractsRegIDFromOpcode(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		opcode byte
+		target r8.Reg
+	}{
+		{
+			opcode: r8.OpADD_A,
+			target: r8.RegA,
+		},
+		{
+			opcode: r8.OpCMP_A,
+			target: r8.RegA,
+		},
+		{
+			opcode: r8.OpDEC_A,
+			target: r8.RegA,
+		},
+		{
+			opcode: r8.OpINC_A,
+			target: r8.RegA,
+		},
+		{
+			opcode: r8.OpLD_A,
+			target: r8.RegA,
+		},
+		{
+			opcode: r8.OpLD_B,
+			target: r8.RegB,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("0x%02X", tc.opcode), func(t *testing.T) {
+			t.Parallel()
+			assert_eq_hex(t, byte(r8.GetTarget(tc.opcode)), byte(tc.target), "wrong target")
+		})
+	}
+}
+
 func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
@@ -249,6 +289,10 @@ func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 		{
 			code:   []byte{r8.OpLD_A, 0x0A},
 			source: "ld a, 0x0A",
+		},
+		{
+			code:   []byte{r8.OpLD_B, 0x01},
+			source: "ld b, 0x01",
 		},
 		{
 			code:   []byte{r8.OpTRAP, 0x20},
