@@ -8,15 +8,23 @@ import (
 
 const (
 	OpADD_A = 0x50
+	OpADD_B = 0x51
 	OpBEQ   = 0xF1
 	OpBRA   = 0xF0
 	OpCMP_A = 0x70
+	OpCMP_B = 0x71
 	OpDEC_A = 0x40
+	OpDEC_B = 0x41
 	OpHALT  = 0x00
 	OpINC_A = 0x30
+	OpINC_B = 0x31
 	OpJMP   = 0xF7
 	OpLD_A  = 0x10
+	OpLD_B  = 0x11
 	OpTRAP  = 0xF9
+
+	RegA = 0x00
+	RegB = 0x01
 
 	TrapPRINT = 0x20
 )
@@ -97,6 +105,8 @@ func (cpu *CPU) UpdateZero(value byte) {
 	cpu.Zero = value == 0x00
 }
 
+type Reg byte
+
 func Disassemble(code []byte) (string, int) {
 	switch code[0] {
 	case OpBEQ:
@@ -134,4 +144,8 @@ func format_word(code []byte) string {
 	addr_lo, addr_hi := code[0], code[1]
 	addr := binary.LittleEndian.Uint16([]byte{addr_lo, addr_hi})
 	return fmt.Sprintf("0x%04X", addr)
+}
+
+func GetTarget(opcode byte) Reg {
+	return Reg(opcode & 0x0F)
 }
