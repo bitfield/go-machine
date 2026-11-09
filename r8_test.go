@@ -12,6 +12,7 @@ func TestNewCPU_InitialisesCPU(t *testing.T) {
 	cpu := r8.NewCPU()
 	assert_eq_hex16(t, cpu.PC, 0x0000, "wrong PC")
 	assert_eq_hex(t, cpu.A, 0x00, "wrong A")
+	assert_eq_hex(t, cpu.B, 0x00, "wrong B")
 	assert_zero(t, cpu, false)
 	assert_eq_hex(t, cpu.Mem[0], 0x00, "wrong memory contents")
 }
@@ -100,17 +101,20 @@ func TestRunRunsUntilHalted(t *testing.T) {
 	assert_eq_hex16(t, cpu.PC, 0x0002, "wrong PC")
 }
 
-func TestLdLoadsAccumulator(t *testing.T) {
+func TestLdLoadsAandB(t *testing.T) {
 	t.Parallel()
 	cpu := r8.NewCPU()
 	cpu.A = 0x0A
+	cpu.B = 0x01
 	cpu.Zero = true
 	cpu.RunProgram([]byte{
 		r8.OpLD_A, 0x05,
+		r8.OpLD_B, 0xFF,
 		r8.OpHALT,
 	})
 	assert_eq_hex(t, cpu.A, 0x05, "wrong A")
-	assert_eq_hex16(t, cpu.PC, 0x0003, "wrong PC")
+	assert_eq_hex(t, cpu.B, 0xFF, "wrong B")
+	assert_eq_hex16(t, cpu.PC, 0x0005, "wrong PC")
 	assert_zero(t, cpu, false)
 }
 
@@ -119,6 +123,12 @@ func TestLdSetsZeroFlag(t *testing.T) {
 	cpu := r8.NewCPU()
 	cpu.RunProgram([]byte{
 		r8.OpLD_A, 0x00,
+		r8.OpHALT,
+	})
+	assert_zero(t, cpu, true)
+	cpu.Zero = false
+	cpu.RunProgram([]byte{
+		r8.OpLD_B, 0x00,
 		r8.OpHALT,
 	})
 	assert_zero(t, cpu, true)

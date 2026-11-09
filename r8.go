@@ -26,7 +26,7 @@ const (
 )
 
 type CPU struct {
-	A    byte
+	A, B byte
 	PC   uint16
 	Mem  [65536]byte
 	Zero bool
@@ -83,6 +83,10 @@ func (cpu *CPU) Step() bool {
 		operand := cpu.Fetch()
 		cpu.A = operand
 		cpu.UpdateZero(cpu.A)
+	case OpLD_B:
+		operand := cpu.Fetch()
+		cpu.B = operand
+		cpu.UpdateZero(cpu.B)
 	case OpTRAP:
 		operand := cpu.Fetch()
 		if operand == TrapPRINT {

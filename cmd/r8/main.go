@@ -25,8 +25,8 @@ func main() {
 	for {
 		code := cpu.Mem[cpu.PC : cpu.PC+3]
 		asm, _ := r8.Disassemble(code)
-		fmt.Println("  PC  A | NEXT")
-		fmt.Printf("%04X %02X | %s\n> ", cpu.PC, cpu.A, asm)
+		fmt.Println("  PC  A  B | NEXT")
+		fmt.Printf("%04X %02X %02X | %s\n> ", cpu.PC, cpu.A, cpu.B, asm)
 		fmt.Scanln(&cmd)
 		if cmd == "g" {
 			cpu.Run()
