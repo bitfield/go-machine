@@ -266,6 +266,15 @@ func TestGetTargetExtractsRegIDFromOpcode(t *testing.T) {
 	}
 }
 
+func TestSetRegister_SetsGivenRegisterToGivenValue(t *testing.T) {
+	t.Parallel()
+	cpu := r8.NewCPU()
+	cpu.SetRegister(r8.RegA, 0xCA)
+	assert_eq_hex(t, cpu.A, 0xCA, "wrong A")
+	cpu.SetRegister(r8.RegB, 0xFE)
+	assert_eq_hex(t, cpu.B, 0xFE, "wrong B")
+}
+
 func TestDisassembleCorrectlyDisassemblesCode(t *testing.T) {
 	t.Parallel()
 	cases := []struct {

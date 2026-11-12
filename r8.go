@@ -50,6 +50,7 @@ func (cpu *CPU) RunProgram(program []byte) {
 
 func (cpu *CPU) Step() bool {
 	opcode := cpu.Fetch()
+	target := GetTarget(opcode)
 	switch opcode {
 	case OpADD_A:
 		operand := cpu.Fetch()
@@ -79,14 +80,10 @@ func (cpu *CPU) Step() bool {
 		addr_hi := cpu.Fetch()
 		addr := binary.LittleEndian.Uint16([]byte{addr_lo, addr_hi})
 		cpu.PC = addr
-	case OpLD_A:
+	case OpLD_A, OpLD_B:
 		operand := cpu.Fetch()
-		cpu.A = operand
-		cpu.UpdateZero(cpu.A)
-	case OpLD_B:
-		operand := cpu.Fetch()
-		cpu.B = operand
-		cpu.UpdateZero(cpu.B)
+		cpu.SetRegister(target, operand)
+		cpu.UpdateZero(operand)
 	case OpTRAP:
 		operand := cpu.Fetch()
 		if operand == TrapPRINT {
@@ -98,6 +95,15 @@ func (cpu *CPU) Step() bool {
 
 func (cpu *CPU) Run() {
 	for cpu.Step() {
+	}
+}
+
+func (cpu *CPU) SetRegister(reg Reg, value byte) {
+	switch reg {
+	case RegA:
+		cpu.A = value
+	case RegB:
+		cpu.B = value
 	}
 }
 
@@ -121,10 +127,8 @@ func Disassemble(code []byte) (string, int) {
 		return "inc a", 1
 	case OpJMP:
 		return fmt.Sprintf("jmp %s", formatWord(code[1:])), 3
-	case OpLD_A:
-		return fmt.Sprintf("ld a, %s", formatByte(code[1:])), 2
-	case OpLD_B:
-		return fmt.Sprintf("ld b, %s", formatByte(code[1:])), 2
+	case OpLD_A, OpLD_B:
+		return fmt.Sprintf("ld %s, %s", formatReg(code[0]), formatByte(code[1:])), 2
 	case OpTRAP:
 		return fmt.Sprintf("trap %s", formatByte(code[1:])), 2
 	default:
@@ -137,6 +141,18 @@ func formatByte(code []byte) string {
 		return "???"
 	}
 	return fmt.Sprintf("0x%02X", code[0])
+}
+
+func formatReg(opcode byte) string {
+	target := GetTarget(opcode)
+	switch target {
+	case RegA:
+		return "a"
+	case RegB:
+		return "b"
+	default:
+		return "???"
+	}
 }
 
 func formatWord(code []byte) string {
